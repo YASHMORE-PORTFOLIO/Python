@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload CSV to Database</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://www.example.com/favicon.ico" type="image/x-icon">
+
+    <!-- External CSS (Google Fonts, Bootstrap for layout) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS for Styling -->
+    <style>
+        /* Basic Page Styling */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #FF6F61, #FF9D85);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        h1 {
+            text-align: center;
+            margin-top: 50px;
+            font-size: 4rem; /* Increased font size */
+            font-weight: 700; /* Make it bold */
+            color: #fff;
+            text-shadow: 4px 4px 6px rgba(0, 0, 0, 0.7); /* Added strong shadow for visibility */
+            letter-spacing: 2px; /* Added spacing between letters */
+            text-transform: uppercase; /* Make it more prominent */
+            margin-bottom: 30px; /* Increased space below the heading */
+        }
+        .container {
+            margin-top: 50px;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .btn {
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #45a049;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .file-input-label {
+            font-size: 18px;
+            color: #4CAF50;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            transition: color 0.3s ease;
+        }
+        .file-input-label:hover {
+            color: #FF6F61;
+        }
+
+        /* File Input Styling */
+        .custom-file-input {
+            display: none;
+        }
+        .custom-file-label {
+            display: block;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            cursor: pointer;
+            color: #4CAF50;
+            transition: all 0.3s ease;
+        }
+        .custom-file-label:hover {
+            background-color: #4CAF50;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .file-name {
+            font-size: 16px;
+            margin-top: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        /* Gradient Animation for Background */
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 500px;
+        }
+        .modal-header {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .modal-body {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .modal-footer button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        /* Additional Styling for Alerts */
+        .alert {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .alert-success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .alert-danger {
+            background-color: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="container">
+        <h1>Upload CSV to Database</h1>
+
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <div class="input-group">
+                <input type="text" class="form-control" name="db_user" placeholder="Database Username" required>
+            </div>
+            <div class="input-group">
+                <input type="password" class="form-control" name="db_password" placeholder="Database Password" required>
+            </div>
+            <div class="input-group">
+                <input type="text" class="form-control" name="db_name" placeholder="Database Name" required>
+            </div>
+
+            <!-- Custom File Upload -->
+            <label class="custom-file-label" for="file-upload">Select CSV File</label>
+            <input type="file" name="file" id="file-upload" class="custom-file-input" accept=".csv" required onchange="displayFileName()">
+            <div id="file-name" class="file-name"></div>
+
+            <button type="submit" class="btn btn-block">Upload</button>
+        </form>
+
+        <!-- Success/Error Alert -->
+        <div id="alert-message" class="alert alert-success">
+            File uploaded successfully and data inserted into the database!
+        </div>
+        <div id="error-message" class="alert alert-danger">
+            An error occurred while uploading the file or inserting data into the database.
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Success!
+            </div>
+            <div class="modal-body">
+                File has been uploaded and data inserted successfully!
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="errorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                Error!
+            </div>
+            <div class="modal-body">
+                There was an issue with uploading the file or inserting data into the database.
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- External JS (jQuery, Bootstrap, Custom) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Show Modal based on success or error
+        function showModal(type) {
+            const modal = type === 'success' ? document.getElementById('successModal') : document.getElementById('errorModal');
+            modal.style.display = 'flex';
+        }
+
+        // Close Modal
+        function closeModal() {
+            const modal = document.getElementById('successModal');
+            const errorModal = document.getElementById('errorModal');
+            modal.style.display = 'none';
+            errorModal.style.display = 'none';
+        }
+
+        // Display the file name when a file is selected
+        function displayFileName() {
+            const fileInput = document.getElementById('file-upload');
+            const fileName = fileInput.files[0].name;
+            document.getElementById('file-name').innerText = `Selected File: ${fileName}`;
+        }
+
+        // Handling alert messages on file upload
+        $(document).ready(function() {
+            const alertMessage = $('#alert-message');
+            const errorMessage = $('#error-message');
+
+            // Show alert messages
+            alertMessage.show();
+            setTimeout(function() {
+                alertMessage.hide();
+            }, 5000);
+
+            errorMessage.show();
+            setTimeout(function() {
+                errorMessage.hide();
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
